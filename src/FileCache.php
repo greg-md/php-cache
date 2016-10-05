@@ -152,9 +152,9 @@ class FileCache implements CacheInterface
     {
         $this->loadStorage();
 
-        $ids = func_num_args() ? (array)$ids : array_keys($this->getAccessor());
+        $ids = func_num_args() ? (array) $ids : array_keys($this->getAccessor());
 
-        foreach($ids as $id) {
+        foreach ($ids as $id) {
             $this->remove($this->fetchFileName($id));
         }
 
@@ -172,7 +172,7 @@ class FileCache implements CacheInterface
 
     public function setPath($name)
     {
-        $this->path = (string)$name;
+        $this->path = (string) $name;
 
         return $this;
     }
@@ -184,7 +184,7 @@ class FileCache implements CacheInterface
 
     public function setSchemaName($name)
     {
-        $this->schemaName = (string)$name;
+        $this->schemaName = (string) $name;
 
         return $this;
     }

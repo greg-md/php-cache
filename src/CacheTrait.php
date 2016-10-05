@@ -23,7 +23,7 @@ trait CacheTrait
             return true;
         }
 
-        if (!ctype_digit((string)$expire)) {
+        if (!ctype_digit((string) $expire)) {
             $expire = strtotime($expire, $modified) - $modified;
         }
 

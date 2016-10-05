@@ -128,10 +128,10 @@ class SqliteCache implements CacheInterface
 
     public function delete($ids = [])
     {
-        $ids = (array)$ids;
+        $ids = (array) $ids;
 
         if ($ids) {
-            foreach($ids as &$id) {
+            foreach ($ids as &$id) {
                 $id = $this->fetchId($id);
             }
             unset($id);
@@ -149,7 +149,7 @@ class SqliteCache implements CacheInterface
 
     public function setPath($name)
     {
-        $this->path = (string)$name;
+        $this->path = (string) $name;
 
         return $this;
     }
