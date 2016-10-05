@@ -43,7 +43,7 @@ class RedisCache implements CacheInterface
     public function save($id, $data = null)
     {
         $this->getAdapter()->hMset($id, [
-            'Content' => $this->serialize($data),
+            'Content'      => $this->serialize($data),
             'LastModified' => time(),
         ]);
 
@@ -70,7 +70,7 @@ class RedisCache implements CacheInterface
         $adapter = $this->getAdapter();
 
         if (func_num_args()) {
-            $ids = (array)$ids;
+            $ids = (array) $ids;
 
             $adapter->delete($ids);
         } else {
@@ -93,7 +93,7 @@ class RedisCache implements CacheInterface
 
     public function setHost($name)
     {
-        $this->host = (string)$name;
+        $this->host = (string) $name;
 
         return $this;
     }
@@ -105,7 +105,7 @@ class RedisCache implements CacheInterface
 
     public function setPort($number)
     {
-        $this->port = (int)$number;
+        $this->port = (int) $number;
 
         return $this;
     }
@@ -117,7 +117,7 @@ class RedisCache implements CacheInterface
 
     public function setPrefix($name)
     {
-        $this->prefix = (string)$name;
+        $this->prefix = (string) $name;
 
         return $this;
     }
@@ -129,7 +129,7 @@ class RedisCache implements CacheInterface
 
     public function setTimeout($number)
     {
-        $this->timeout = (double)$number;
+        $this->timeout = (float) $number;
 
         return $this;
     }
@@ -137,7 +137,7 @@ class RedisCache implements CacheInterface
     public function getAdapter()
     {
         if (!$this->adapter) {
-            $this->adapter = new \Redis;
+            $this->adapter = new \Redis();
 
             $this->adapter->connect($this->getHost(), $this->getPort(), $this->getTimeout());
 
