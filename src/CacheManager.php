@@ -20,8 +20,10 @@ class CacheManager implements CacheInterface
 
     /**
      * @param $name
-     * @return CacheInterface
+     *
      * @throws \Exception
+     *
+     * @return CacheInterface
      */
     public function get($name)
     {
