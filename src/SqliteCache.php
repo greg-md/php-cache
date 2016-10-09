@@ -1,9 +1,6 @@
 <?php
 
-namespace Greg\Cache\Storage;
-
-use Greg\Cache\CacheInterface;
-use Greg\Cache\CacheTrait;
+namespace Greg\Cache;
 
 class SqliteCache implements CacheInterface
 {
