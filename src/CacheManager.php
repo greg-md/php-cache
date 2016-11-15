@@ -5,13 +5,13 @@ namespace Greg\Cache;
 use Greg\Support\Accessor\AccessorTrait;
 use Greg\Support\Obj;
 
-class CacheManager implements CacheInterface
+class CacheManager implements CacheStrategy
 {
     use AccessorTrait;
 
     protected $defaultContainerName = null;
 
-    public function set($name, CacheInterface $driver)
+    public function set($name, CacheStrategy $driver)
     {
         $this->setToAccessor($name, $driver);
 
@@ -23,7 +23,7 @@ class CacheManager implements CacheInterface
      *
      * @throws \Exception
      *
-     * @return CacheInterface
+     * @return CacheStrategy
      */
     public function get($name)
     {
@@ -34,8 +34,8 @@ class CacheManager implements CacheInterface
         if (is_callable($cache)) {
             $cache = Obj::callCallable($cache);
 
-            if (!($cache instanceof CacheInterface)) {
-                throw new \Exception('Cache container `' . $name . '` must be an instance of `' . CacheInterface::class . '`');
+            if (!($cache instanceof CacheStrategy)) {
+                throw new \Exception('Cache container `' . $name . '` must be an instance of `' . CacheStrategy::class . '`');
             }
 
             $this->setToAccessor($name, $cache);

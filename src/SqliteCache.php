@@ -2,7 +2,7 @@
 
 namespace Greg\Cache;
 
-class SqliteCache implements CacheInterface
+class SqliteCache implements CacheStrategy
 {
     use CacheTrait;
 

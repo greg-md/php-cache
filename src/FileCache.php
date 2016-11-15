@@ -4,7 +4,7 @@ namespace Greg\Cache;
 
 use Greg\Support\Accessor\AccessorTrait;
 
-class FileCache implements CacheInterface
+class FileCache implements CacheStrategy
 {
     use AccessorTrait, CacheTrait;
 

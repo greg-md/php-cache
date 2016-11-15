@@ -2,7 +2,7 @@
 
 namespace Greg\Cache;
 
-class RedisCache implements CacheInterface
+class RedisCache implements CacheStrategy
 {
     use CacheTrait;
 

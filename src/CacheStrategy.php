@@ -2,7 +2,7 @@
 
 namespace Greg\Cache;
 
-interface CacheInterface
+interface CacheStrategy
 {
     public function fetch($id, callable $callable, $expire = 0);
 
