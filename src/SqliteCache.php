@@ -1,170 +1,216 @@
 <?php
+declare(strict_types=1);
 
 namespace Greg\Cache;
 
-class SqliteCache implements CacheStrategy
+class SqliteCache extends CacheAbstract
 {
-    use CacheTrait;
+    private $adapter;
 
-    private $path = null;
-
-    private $structureChecked = false;
-
-    private $adapter = null;
-
-    public function __construct($path = null)
+    public function __construct(\PDO $adapter, int $ttl = 300)
     {
-        if ($path !== null) {
-            $this->setPath($path);
-        }
+        $this->adapter = $adapter;
 
-        return $path;
-    }
+        $this->ttl = $this->validateTTL($ttl);
 
-    protected function checkAndBuildStructure()
-    {
-        if (!$this->structureChecked) {
-            if (!$this->checkStructure()) {
-                $this->buildStructure();
-
-                if (!$this->checkStructure()) {
-                    throw new \Exception('Impossible to build SQLite structure.');
-                }
-            }
-
-            $this->structureChecked = true;
-        }
+        $this->checkAndBuildStructure();
 
         return $this;
     }
 
-    protected function checkStructure()
+    public function has(string $key): bool
     {
-        $stmt = $this->getAdapter()->query('SELECT 1 FROM sqlite_master WHERE type = "table" and name = "Cache" LIMIT 1');
+        $stmt = $this->adapter->prepare('SELECT ExpiresAt FROM Cache WHERE Key = :Key');
+
+        $stmt->bindValue(':Key', $key);
+
+        $stmt->execute();
+
+        $expiresAt = $stmt->fetchColumn();
+
+        if ($expiresAt === false) {
+            return false;
+        }
+
+        if ($this->isExpired((int) $expiresAt)) {
+            $this->delete($key);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function hasMultiple(array $keys): bool
+    {
+        $stmt = $this->adapter->prepare('SELECT Key, ExpiresAt FROM Cache WHERE Key IN (' . $this->stmtKeys($keys) . ')');
+
+        $this->stmtBindKeys($stmt, $keys);
+
+        $stmt->execute();
+
+        $expiredKeys = [];
+
+        $count = 0;
+
+        while ($row = $stmt->fetch()) {
+            if ($this->isExpired((int) $row['ExpiresAt'])) {
+                $expiredKeys[] = $row['Key'];
+            }
+
+            ++$count;
+        }
+
+        if ($expiredKeys) {
+            $this->deleteMultiple($expiredKeys);
+
+            return false;
+        }
+
+        return $count == count($keys);
+    }
+
+    public function get(string $key, $default = null)
+    {
+        $stmt = $this->adapter->prepare('SELECT Value, ExpiresAt FROM Cache WHERE Key = :Key');
+
+        $stmt->bindValue(':Key', $key);
+
+        $stmt->execute();
+
+        if (!$row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            return $default;
+        }
+
+        if ($this->isExpired((int) $row['ExpiresAt'])) {
+            $this->delete($key);
+
+            return $default;
+        }
+
+        return $row['Value'] ? unserialize($row['Value']) : $default;
+    }
+
+    public function getMultiple(array $keys, $default = null)
+    {
+        $stmt = $this->adapter->prepare('SELECT Key, Value, ExpiresAt FROM Cache WHERE Key IN (' . $this->stmtKeys($keys) . ')');
+
+        $this->stmtBindKeys($stmt, $keys);
+
+        $stmt->execute();
+
+        $expiredKeys = [];
+
+        $rows = [];
+
+        while ($row = $stmt->fetch()) {
+            if ($this->isExpired((int) $row['ExpiresAt'])) {
+                $expiredKeys[] = $row['Key'];
+
+                continue;
+            }
+
+            if ($row['Value']) {
+                $rows[$row['Key']] = unserialize($row['Value']);
+            }
+        }
+
+        if ($expiredKeys) {
+            $this->deleteMultiple($expiredKeys);
+        }
+
+        $values = [];
+
+        foreach ($keys as $key) {
+            $values[$key] = $rows[$key] ?? $default;
+        }
+
+        return $values;
+    }
+
+    public function set(string $key, $value, ?int $ttl = null)
+    {
+        if ($this->has($key)) {
+            $stmt = $this->adapter->prepare('UPDATE Cache SET Value = :Value, ExpiresAt = :ExpiresAt WHERE Key = :Key');
+        } else {
+            $stmt = $this->adapter->prepare('INSERT INTO Cache(Key, Value, ExpiresAt) VALUES (:Key, :Value, :ExpiresAt)');
+        }
+
+        $stmt->bindValue(':Key', $key);
+
+        $stmt->bindValue(':Value', serialize($value), \PDO::PARAM_LOB);
+
+        $stmt->bindValue(':ExpiresAt', $this->getExpiresAt($ttl));
+
+        $stmt->execute();
+
+        return $this;
+    }
+
+    public function delete(string $key)
+    {
+        $stmt = $this->adapter->prepare('DELETE FROM Cache WHERE Key = :Key');
+
+        $stmt->bindValue(':Key', $key);
+
+        $stmt->execute();
+
+        return $this;
+    }
+
+    public function deleteMultiple(array $keys)
+    {
+        $stmt = $this->adapter->prepare('DELETE FROM Cache WHERE Key IN (' . $this->stmtKeys($keys) . ')');
+
+        $this->stmtBindKeys($stmt, $keys);
+
+        $stmt->execute();
+
+        return $this;
+    }
+
+    public function clear()
+    {
+        $this->adapter->exec('DELETE FROM Cache');
+
+        return $this;
+    }
+
+    protected function structureExists(): bool
+    {
+        $stmt = $this->adapter->query('SELECT 1 FROM sqlite_master WHERE type = "table" and name = "Cache"');
 
         return $stmt->fetch() ? true : false;
     }
 
     protected function buildStructure()
     {
-        $this->getAdapter()->exec('CREATE TABLE Cache (Id VARCHAR(32) PRIMARY KEY, Content BLOB, LastModified INTEGER)');
+        $this->adapter->exec('CREATE TABLE Cache (Key VARCHAR(255) PRIMARY KEY, Value BLOB, ExpiresAt INTEGER)');
 
-        $this->getAdapter()->exec('CREATE INDEX CacheLastModified ON Cache(LastModified)');
+        $this->adapter->exec('CREATE INDEX CacheExpiresAt ON Cache(ExpiresAt)');
 
         return $this;
     }
 
-    protected function fetchId($id)
+    protected function checkAndBuildStructure()
     {
-        return md5($id);
-    }
-
-    public function save($id, $data = null)
-    {
-        if ($this->has($id)) {
-            $stmt = $this->getAdapter()->prepare('UPDATE Cache SET Content = :Content, LastModified = :LastModified WHERE Id = :Id');
-
-            $stmt->bindValue(':Content', $this->serialize($data), \PDO::PARAM_LOB);
-            $stmt->bindValue(':LastModified', time());
-            $stmt->bindValue(':Id', $this->fetchId($id));
-
-            $stmt->execute();
-        } else {
-            $stmt = $this->getAdapter()->prepare('INSERT INTO Cache(Id, Content, LastModified) VALUES (:Id, :Content, :LastModified)');
-
-            $stmt->bindValue(':Id', $this->fetchId($id));
-            $stmt->bindValue(':Content', $this->serialize($data), \PDO::PARAM_LOB);
-            $stmt->bindValue(':LastModified', time());
-
-            $stmt->execute();
+        if (!$this->structureExists()) {
+            $this->buildStructure();
         }
 
         return $this;
     }
 
-    public function has($id)
+    protected function stmtKeys(array $keys)
     {
-        $stmt = $this->getAdapter()->prepare('SELECT 1 FROM Cache WHERE Id = :Id LIMIT 1');
-
-        $stmt->bindValue(':Id', $this->fetchId($id));
-
-        $stmt->execute();
-
-        return $stmt->fetch() ? true : false;
+        return implode(', ', array_fill(0, count($keys), '?'));
     }
 
-    public function load($id)
+    protected function stmtBindKeys(\PDOStatement $stmt, array $keys)
     {
-        $stmt = $this->getAdapter()->prepare('SELECT Content FROM Cache WHERE Id = :Id LIMIT 1');
-
-        $stmt->bindValue(':Id', $this->fetchId($id));
-
-        $stmt->execute();
-
-        $row = $stmt->fetch();
-
-        $content = $row ? $row['Content'] : null;
-
-        return $content ? unserialize($content) : null;
-    }
-
-    public function getLastModified($id)
-    {
-        $stmt = $this->getAdapter()->prepare('SELECT LastModified FROM Cache WHERE Id = :Id LIMIT 1');
-
-        $stmt->bindValue(':Id', $this->fetchId($id));
-
-        $stmt->execute();
-
-        $row = $stmt->fetch();
-
-        $lastModified = $row ? $row['LastModified'] : null;
-
-        return $lastModified;
-    }
-
-    public function delete($ids = [])
-    {
-        $ids = (array) $ids;
-
-        if ($ids) {
-            foreach ($ids as &$id) {
-                $id = $this->fetchId($id);
-            }
-            unset($id);
-
-            return $this->getAdapter()->exec('DELETE FROM Cache WHERE Id IN (' . implode(', ', $ids) . ')');
+        foreach (array_values($keys) as $k => $key) {
+            $stmt->bindValue($k + 1, $key);
         }
-
-        return $this->getAdapter()->exec('DELETE FROM Cache');
-    }
-
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    public function setPath($name)
-    {
-        $this->path = (string) $name;
-
-        return $this;
-    }
-
-    public function getAdapter()
-    {
-        if (!$this->adapter) {
-            $this->adapter = new \PDO('sqlite:' . $this->getPath());
-
-            $this->checkAndBuildStructure();
-        }
-
-        return $this->adapter;
-    }
-
-    public function setAdapter(\PDO $adapter)
-    {
-        $this->adapter = $adapter;
 
         return $this;
     }

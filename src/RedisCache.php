@@ -1,154 +1,64 @@
 <?php
+declare(strict_types=1);
 
 namespace Greg\Cache;
 
-class RedisCache implements CacheStrategy
+class RedisCache extends CacheAbstract
 {
-    use CacheTrait;
+    private $adapter;
 
-    private $host = '127.0.0.1';
-
-    private $port = 6379;
-
-    private $prefix = null;
-
-    private $timeout = 0.0;
-
-    private $adapter = null;
-
-    public function __construct($host = null, $port = null, $prefix = null, $timeout = null)
-    {
-        if ($host !== null) {
-            $this->setHost($host);
-        }
-
-        if ($port !== null) {
-            $this->setPort($port);
-        }
-
-        if ($prefix !== null) {
-            $this->setPrefix($prefix);
-        }
-
-        if ($timeout !== null) {
-            $this->setTimeout($timeout);
-        }
-
-        return $this;
-    }
-
-    public function save($id, $data = null)
-    {
-        $this->getAdapter()->hMset($id, [
-            'Content'      => $this->serialize($data),
-            'LastModified' => time(),
-        ]);
-
-        return $this;
-    }
-
-    public function has($id)
-    {
-        return $this->getAdapter()->exists($id);
-    }
-
-    public function load($id)
-    {
-        return $this->unserialize($this->getAdapter()->hGet($id, 'Content'));
-    }
-
-    public function getLastModified($id)
-    {
-        return $this->getAdapter()->hGet($id, 'LastModified');
-    }
-
-    public function delete($ids = [])
-    {
-        $adapter = $this->getAdapter();
-
-        if (func_num_args()) {
-            $ids = (array) $ids;
-
-            $adapter->delete($ids);
-        } else {
-            $ids = $adapter->getKeys('*');
-
-            $adapter->setOption(\Redis::OPT_PREFIX, '');
-
-            $adapter->delete($ids);
-
-            $adapter->setOption(\Redis::OPT_PREFIX, $this->getPrefix());
-        }
-
-        return $this;
-    }
-
-    public function getHost()
-    {
-        return $this->host;
-    }
-
-    public function setHost($name)
-    {
-        $this->host = (string) $name;
-
-        return $this;
-    }
-
-    public function getPort()
-    {
-        return $this->port;
-    }
-
-    public function setPort($number)
-    {
-        $this->port = (int) $number;
-
-        return $this;
-    }
-
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    public function setPrefix($name)
-    {
-        $this->prefix = (string) $name;
-
-        return $this;
-    }
-
-    public function getTimeout()
-    {
-        return $this->timeout;
-    }
-
-    public function setTimeout($number)
-    {
-        $this->timeout = (float) $number;
-
-        return $this;
-    }
-
-    public function getAdapter()
-    {
-        if (!$this->adapter) {
-            $this->adapter = new \Redis();
-
-            $this->adapter->connect($this->getHost(), $this->getPort(), $this->getTimeout());
-
-            if ($prefix = $this->getPrefix()) {
-                $this->adapter->setOption(\Redis::OPT_PREFIX, $prefix);
-            }
-        }
-
-        return $this->adapter;
-    }
-
-    public function setAdapter(\Redis $adapter)
+    public function __construct(\Redis $adapter, int $ttl = 300)
     {
         $this->adapter = $adapter;
+
+        $this->ttl = 300;
+
+        return $this;
+    }
+
+    public function has(string $key): bool
+    {
+        return $this->adapter->exists($key);
+    }
+
+    public function get(string $key, $default = null)
+    {
+        if ($contents = $this->adapter->get($key)) {
+            return unserialize($contents);
+        }
+
+        return null;
+    }
+
+    public function set(string $key, $value, ?int $ttl = null)
+    {
+        if ($ttl = $this->getTTL($ttl)) {
+            $this->adapter->setex($key, $ttl, serialize($value));
+        } else {
+            $this->adapter->set($key, serialize($value));
+        }
+
+        return $this;
+    }
+
+    public function delete(string $key)
+    {
+        $this->adapter->delete($key);
+
+        return $this;
+    }
+
+    public function clear()
+    {
+        $prefix = $this->adapter->getOption(\Redis::OPT_PREFIX);
+
+        $keys = $this->adapter->keys('*');
+
+        $this->adapter->setOption(\Redis::OPT_PREFIX, '');
+
+        $this->adapter->delete($keys);
+
+        $this->adapter->setOption(\Redis::OPT_PREFIX, $prefix);
 
         return $this;
     }

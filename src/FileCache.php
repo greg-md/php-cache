@@ -1,98 +1,176 @@
 <?php
+declare(strict_types=1);
 
 namespace Greg\Cache;
 
-use Greg\Support\Accessor\AccessorTrait;
-
-class FileCache implements CacheStrategy
+class FileCache extends CacheAbstract
 {
-    use AccessorTrait, CacheTrait;
+    private $path;
 
-    private $path = null;
+    private $gcProbability;
 
-    private $schemaName = 'schema';
+    private $gcDivisor;
 
-    private $storage = null;
+    private $extension = '.cache.txt';
 
-    public function __construct($path = null, $schemaName = null)
+    public function __construct(string $path, int $ttl = 300, int $gcProbability = 1, int $gcDivisor = 100)
     {
-        if ($path !== null) {
-            $this->setPath($path);
+        $this->path = $path;
+
+        $this->ttl = $this->validateTTL($ttl);
+
+        $this->gcProbability = $gcProbability;
+
+        $this->gcDivisor = $gcDivisor;
+
+        $this->checkGarbageCollection();
+
+        return $this;
+    }
+
+    public function has(string $key): bool
+    {
+        if ($this->isKeyExpired($key)) {
+            $this->deleteKey($key);
+
+            return false;
         }
 
-        if ($schemaName !== null) {
-            $this->setSchemaName($schemaName);
+        return true;
+    }
+
+    public function hasMultiple(array $keys): bool
+    {
+        $has = true;
+
+        foreach ($keys as $key) {
+            if ($this->isKeyExpired($key)) {
+                $this->deleteKey($key);
+
+                $has = false;
+            }
+        }
+
+        return $has;
+    }
+
+    public function get(string $key, $default = null)
+    {
+        $file = $this->getFile($key);
+
+        if (file_exists($file) and !is_readable($file)) {
+            throw new CacheException('Cache item `' . $key . '` is not readable.');
+        }
+
+        if ($this->isFileExpired($file)) {
+            $this->deleteFile($file);
+
+            return $default;
+        }
+
+        $contents = file($file);
+
+        return $contents ? unserialize($contents[1] ?? '') : $default;
+    }
+
+    public function set(string $key, $value, ?int $ttl = null)
+    {
+        $this->validatePath();
+
+        file_put_contents($this->getNewFile($key), $this->getExpiresAt($ttl) . PHP_EOL . serialize($value));
+
+        return $this;
+    }
+
+    public function delete(string $key)
+    {
+        return $this->deleteKey($key);
+    }
+
+    public function clear()
+    {
+        $files = glob($this->path . DIRECTORY_SEPARATOR . '*' . $this->extension);
+
+        foreach ($files as $file) {
+            unlink($file);
         }
 
         return $this;
     }
 
-    protected function storageIsLoaded()
+    public function collectGarbage()
     {
-        return $this->storage === null;
-    }
+        $files = glob($this->path . DIRECTORY_SEPARATOR . '*' . $this->extension);
 
-    protected function loadStorage()
-    {
-        if (!$this->storageIsLoaded()) {
-            $this->setAccessor($this->read($this->getSchemaName()));
+        foreach ($files as $file) {
+            $ttl = $this->getFileTTL($file);
+
+            if ($this->isExpired($ttl)) {
+                unlink($file);
+            }
         }
 
         return $this;
     }
 
-    protected function fetchFileName($id)
+    protected function validatePath()
     {
-        return md5($id);
-    }
-
-    protected function getFilePath($name)
-    {
-        return $this->getPath() . DIRECTORY_SEPARATOR . $name;
-    }
-
-    protected function read($name)
-    {
-        $file = $this->getFilePath($name);
-
-        if (!file_exists($file)) {
-            return null;
+        if (!file_exists($this->path)) {
+            throw new CacheException('Cache path not exists.');
         }
 
-        if (!is_readable($file)) {
-            throw new \Exception('Cache file `' . $name . '` from `' . $this->getSchemaName() . '` is not readable.');
+        if (!is_readable($this->path)) {
+            throw new CacheException('Cache path is not readable.');
         }
 
-        return $this->unserialize(file_get_contents($file));
-    }
-
-    protected function write($name, $data)
-    {
-        $path = $this->getPath();
-
-        if (!is_readable($path)) {
-            throw new \Exception('Cache path for `' . $this->getSchemaName() . '` is not readable.');
+        if (!is_writable($this->path)) {
+            throw new CacheException('Cache path is not writable.');
         }
-
-        if (!is_writable($path)) {
-            throw new \Exception('Cache path for `' . $this->getSchemaName() . '` is not writable.');
-        }
-
-        $file = $this->getFilePath($name);
-
-        if (file_exists($file) and !is_writable($file)) {
-            throw new \Exception('Cache file `' . $file . '` from `' . $this->getSchemaName() . '` is not writable.');
-        }
-
-        file_put_contents($file, $this->serialize($data));
 
         return $this;
     }
 
-    protected function remove($name)
+    protected function getFile(string $key): string
     {
-        $file = $this->getFilePath($name);
+        return $this->path . DIRECTORY_SEPARATOR . md5($key) . $this->extension;
+    }
 
+    protected function getNewFile(string $key)
+    {
+        $file = $this->getFile($key);
+
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        return $file;
+    }
+
+    protected function getFileTTL($file): ?int
+    {
+        if (is_readable($file)) {
+            $ttl = trim(fgets(fopen($file, 'r')));
+
+            if (ctype_digit((string) $ttl)) {
+                return (int) $ttl;
+            }
+        }
+
+        return null;
+    }
+
+    protected function isFileExpired(string $file): bool
+    {
+        return $this->isExpired($this->getFileTTL($file));
+    }
+
+    protected function isKeyExpired(string $key): bool
+    {
+        return $this->isFileExpired($this->getFile($key));
+    }
+
+    protected function deleteFile(string $file)
+    {
         if (file_exists($file)) {
             unlink($file);
         }
@@ -100,91 +178,16 @@ class FileCache implements CacheStrategy
         return $this;
     }
 
-    protected function add($id)
+    protected function deleteKey(string $key)
     {
-        $this->loadStorage();
-
-        $this->setToAccessor($id, time());
-
-        $this->update();
-
-        return $this;
+        return $this->deleteFile($this->getFile($key));
     }
 
-    protected function update()
+    protected function checkGarbageCollection()
     {
-        if ($this->storageIsLoaded()) {
-            $this->write($this->getSchemaName(), $this->getAccessor());
+        if ($this->gcDivisor > 0 and mt_rand(1, $this->gcDivisor) <= $this->gcProbability) {
+            $this->collectGarbage();
         }
-
-        return $this;
-    }
-
-    public function save($id, $data = null)
-    {
-        $this->write($this->fetchFileName($id), $data);
-
-        $this->add($id);
-
-        return $this;
-    }
-
-    public function has($id)
-    {
-        $this->loadStorage();
-
-        return array_key_exists($id, $this->getAccessor());
-    }
-
-    public function load($id)
-    {
-        return $this->read($this->fetchFileName($id));
-    }
-
-    public function getLastModified($id)
-    {
-        $this->loadStorage();
-
-        return $this->getFromAccessor($id);
-    }
-
-    public function delete($ids = [])
-    {
-        $this->loadStorage();
-
-        $ids = func_num_args() ? (array) $ids : array_keys($this->getAccessor());
-
-        foreach ($ids as $id) {
-            $this->remove($this->fetchFileName($id));
-        }
-
-        $this->setAccessor(array_diff($this->getAccessor(), $ids));
-
-        $this->update();
-
-        return $this;
-    }
-
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    public function setPath($name)
-    {
-        $this->path = (string) $name;
-
-        return $this;
-    }
-
-    public function getSchemaName()
-    {
-        return $this->schemaName;
-    }
-
-    public function setSchemaName($name)
-    {
-        $this->schemaName = (string) $name;
 
         return $this;
     }

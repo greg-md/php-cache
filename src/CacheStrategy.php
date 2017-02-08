@@ -1,20 +1,31 @@
 <?php
+declare(strict_types=1);
 
 namespace Greg\Cache;
 
 interface CacheStrategy
 {
-    public function fetch($id, callable $callable, $expire = 0);
+    public function has(string $key): bool;
 
-    public function save($id, $data = null);
+    public function hasMultiple(array $keys): bool;
 
-    public function has($id);
+    public function get(string $key, $default = null);
 
-    public function load($id);
+    public function getMultiple(array $keys, $default = null);
 
-    public function getLastModified($id);
+    public function set(string $key, $value, ?int $ttl = null);
 
-    public function isExpired($id, $expire = 0);
+    public function setMultiple(array $values, ?int $ttl = null);
 
-    public function delete($ids = []);
+    public function setForever(string $key, $value);
+
+    public function setMultipleForever(array $values);
+
+    public function delete(string $key);
+
+    public function deleteMultiple(array $keys);
+
+    public function clear();
+
+    public function fetch(string $key, callable $callable, ?int $ttl = null);
 }

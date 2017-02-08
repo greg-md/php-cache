@@ -3,8 +3,12 @@ language: php
 php:
   - '7.1'
 
+services:
+  - redis-server
+
 install:
-  composer install
+  - travis/phpredis.sh
+  - composer install
 
 script:
-  vendor/bin/phpunit
+  - vendor/bin/phpunit
