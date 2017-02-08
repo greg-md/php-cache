@@ -49,7 +49,7 @@ $cache->register('container1', function() {
     return new \Greg\Cache\RedisCache($redis);
 }, true);
 
-$cache->registerStrategy('container2', \Greg\Cache\FileCache(__DIR__ . '/storage'));
+$cache->registerStrategy('container2', new \Greg\Cache\FileCache(__DIR__ . '/storage'));
 ```
 
 **Optionally**, you can define a default strategy to be used by the cache manager.
