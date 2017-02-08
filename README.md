@@ -41,15 +41,24 @@ In the next example we will use a cache manager.
 ```php
 $cache = new \Greg\Cache\CacheManager();
 
-$cache->register('container1', function() {
+// Register file cache
+$cache->registerStrategy('container1', new \Greg\Cache\FileCache(__DIR__ . '/storage'));
+
+// Register sqlite cache
+$cache->register('container2', function() {
+    $pdo = new \PDO('sqlite:' . __DIR__ . '/storage/container2.sqlite');
+
+    return new \Greg\Cache\SqliteCache($pdo);
+}, true);
+
+// Register redis cache
+$cache->register('container3', function() {
     $redis = new \Redis();
 
     $redis->connect('127.0.0.1');
 
     return new \Greg\Cache\RedisCache($redis);
 }, true);
-
-$cache->registerStrategy('container2', new \Greg\Cache\FileCache(__DIR__ . '/storage'));
 ```
 
 **Optionally**, you can define a default strategy to be used by the cache manager.
