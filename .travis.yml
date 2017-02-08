@@ -7,7 +7,7 @@ services:
   - redis-server
 
 before_install:
-  - ./travis/phpredis.sh
+  - travis/phpredis.sh
 
 install:
   - composer install
