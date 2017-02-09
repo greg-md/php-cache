@@ -107,7 +107,8 @@ Below you can find a list of **supported methods**.
 * [incrementFloat](#incrementfloat) - Increment a float value;
 * [decrementFloat](#decrementfloat) - Decrement a float value;
 * [touch](#touch) - Set a new expiration on an item;
-* [pull](#pull) - Retrieve and delete an item from the cache.
+* [pull](#pull) - Retrieve and delete an item from the cache;
+* [add](#add) - Persists data in the cache if it's not present.
 
 ## has
 
@@ -454,6 +455,28 @@ _Example:_
 $strategy->pull('foo'); // return foo value
 
 $strategy->pull('foo'); // return null
+```
+
+## add
+
+Persists data in the cache if it's not present.
+
+```php
+add(string $key, $value, ?int $ttl = null): $this
+```
+
+`$key` - The key of the item to store;  
+`$value` - The value of the item to store, must be serializable;  
+`$ttl` - Optional. The TTL value of this item. If no value is sent and
+            the driver supports TTL then the library may set a default value
+            for it or let the driver take care of that.  
+
+Return `true` if the item is actually added to the cache. Otherwise, return `false`.
+
+_Example:_
+
+```php
+$strategy->set('foo', 'FOO');
 ```
 
 # License
