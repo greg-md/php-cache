@@ -476,7 +476,9 @@ Return `true` if the item is actually added to the cache. Otherwise, return `fal
 _Example:_
 
 ```php
-$strategy->set('foo', 'FOO');
+$strategy->add('foo', 'FOO'); // return true
+
+$strategy->add('foo', 'FOO2'); // return false
 ```
 
 # License
