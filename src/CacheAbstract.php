@@ -44,7 +44,7 @@ abstract class CacheAbstract implements CacheStrategy
         return $this->set($key, $value, 0);
     }
 
-    public function setMultipleForever(array $values)
+    public function foreverMultiple(array $values)
     {
         return $this->setMultiple($values, 0);
     }
