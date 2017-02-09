@@ -98,7 +98,7 @@ Below you can find a list of **supported methods**.
 * [delete](#delete) - Delete an item from the cache by its unique key;
 * [deleteMultiple](#deleteMultiple) - Delete multiple items from the cache by their unique keys;
 * [clear](#clear) - Clear the storage;
-* [fetch](#fetch) - Fetch a value from the storage;
+* [fetch](#fetch) - Fetch a value from the cache and persist it if it is not present in that cache;
 
 ## has
 
