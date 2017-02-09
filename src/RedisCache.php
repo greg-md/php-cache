@@ -25,7 +25,7 @@ class RedisCache extends CacheAbstract
     public function get(string $key, $default = null)
     {
         if ($contents = $this->adapter->get($key)) {
-            return unserialize($contents);
+            return $this->unserialize($contents);
         }
 
         return null;
@@ -34,9 +34,9 @@ class RedisCache extends CacheAbstract
     public function set(string $key, $value, ?int $ttl = null)
     {
         if ($ttl = $this->getTTL($ttl)) {
-            $this->adapter->setex($key, $ttl, serialize($value));
+            $this->adapter->setex($key, $ttl, $this->serialize($value));
         } else {
-            $this->adapter->set($key, serialize($value));
+            $this->adapter->set($key, $this->serialize($value));
         }
 
         return $this;

@@ -69,14 +69,14 @@ class FileCache extends CacheAbstract
 
         $contents = file($file);
 
-        return $contents ? unserialize($contents[1] ?? '') : $default;
+        return $contents ? $this->unserialize($contents[1] ?? '') : $default;
     }
 
     public function set(string $key, $value, ?int $ttl = null)
     {
         $this->validatePath();
 
-        file_put_contents($this->getNewFile($key), $this->getExpiresAt($ttl) . PHP_EOL . serialize($value));
+        file_put_contents($this->getNewFile($key), $this->getExpiresAt($ttl) . PHP_EOL . $this->serialize($value));
 
         return $this;
     }

@@ -65,14 +65,14 @@ class TmpCache extends CacheAbstract
 
         $value = trim(fgets($file));
 
-        return unserialize($value);
+        return $this->unserialize($value);
     }
 
     public function set(string $key, $value, ?int $ttl = null)
     {
         $file = tmpfile();
 
-        fwrite($file, $this->getExpiresAt($ttl) . PHP_EOL . $value);
+        fwrite($file, $this->getExpiresAt($ttl) . PHP_EOL . $this->serialize($value));
 
         $this->storage[$key] = $file;
 

@@ -131,4 +131,30 @@ abstract class CacheAbstract implements CacheStrategy
 
         return $ttl > 0 ? time() + $ttl : 0;
     }
+
+    protected function serialize($value)
+    {
+        if (ctype_digit((string) $value)) {
+            return (int) $value;
+        }
+
+        if (is_numeric((string) $value)) {
+            return (float) $value;
+        }
+
+        return serialize($value);
+    }
+
+    protected function unserialize($value)
+    {
+        if (ctype_digit((string) $value)) {
+            return (int) $value;
+        }
+
+        if (is_numeric((string) $value)) {
+            return (float) $value;
+        }
+
+        return unserialize($value);
+    }
 }

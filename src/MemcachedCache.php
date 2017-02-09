@@ -25,7 +25,7 @@ class MemcachedCache extends CacheAbstract
     public function get(string $key, $default = null)
     {
         if ($contents = $this->adapter->get($key)) {
-            return unserialize($contents);
+            return $this->unserialize($contents);
         }
 
         return null;
@@ -35,7 +35,7 @@ class MemcachedCache extends CacheAbstract
     {
         $ttl = $this->getTTL($ttl);
 
-        $this->adapter->set($key, serialize($value), $ttl ? time() + $ttl : 0);
+        $this->adapter->set($key, $this->serialize($value), $ttl ? time() + $ttl : 0);
 
         return $this;
     }

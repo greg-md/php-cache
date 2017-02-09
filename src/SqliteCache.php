@@ -93,7 +93,7 @@ class SqliteCache extends CacheAbstract
             return $default;
         }
 
-        return $row['Value'] ? unserialize($row['Value']) : $default;
+        return $row['Value'] ? $this->unserialize($row['Value']) : $default;
     }
 
     public function getMultiple(array $keys, $default = null)
@@ -116,7 +116,7 @@ class SqliteCache extends CacheAbstract
             }
 
             if ($row['Value']) {
-                $rows[$row['Key']] = unserialize($row['Value']);
+                $rows[$row['Key']] = $this->unserialize($row['Value']);
             }
         }
 
@@ -143,7 +143,7 @@ class SqliteCache extends CacheAbstract
 
         $stmt->bindValue(':Key', $key);
 
-        $stmt->bindValue(':Value', serialize($value), \PDO::PARAM_LOB);
+        $stmt->bindValue(':Value', $this->serialize($value), \PDO::PARAM_LOB);
 
         $stmt->bindValue(':ExpiresAt', $this->getExpiresAt($ttl));
 
