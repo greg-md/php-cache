@@ -52,7 +52,7 @@ $cache->register('container2', function() {
     $pdo = new \PDO('sqlite:' . __DIR__ . '/storage/container2.sqlite');
 
     return new \Greg\Cache\SqliteCache($pdo);
-}, true);
+});
 
 // Register redis cache
 $cache->register('container3', function() {
@@ -61,7 +61,7 @@ $cache->register('container3', function() {
     $redis->connect('127.0.0.1');
 
     return new \Greg\Cache\RedisCache($redis);
-}, true);
+});
 ```
 
 **Optionally**, you can define a default strategy to be used by the cache manager.
