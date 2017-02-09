@@ -51,4 +51,18 @@ class MemcachedCache extends CacheAbstract
 
         return $this;
     }
+
+    public function increment(string $key, int $amount = 1)
+    {
+        $this->adapter->increment($key, $amount);
+
+        return $this;
+    }
+
+    public function decrement(string $key, int $amount = 1)
+    {
+        $this->adapter->decrement($key, $amount);
+
+        return $this;
+    }
 }
