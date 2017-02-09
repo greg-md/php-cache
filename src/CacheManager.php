@@ -140,7 +140,7 @@ class CacheManager implements CacheStrategy
         return $this;
     }
 
-    public function fetch(string $key, callable $callable, ?int $ttl = null)
+    public function remember(string $key, callable $callable, ?int $ttl = null)
     {
         return $this->store()->fetch($key, $callable, $ttl);
     }

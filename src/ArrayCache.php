@@ -55,7 +55,7 @@ class ArrayCache extends CacheAbstract
             return $default;
         }
 
-        return unserialize($item['Value']);
+        return $item['Value'];
     }
 
     public function set(string $key, $value, ?int $ttl = null)

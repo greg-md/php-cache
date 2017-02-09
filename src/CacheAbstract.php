@@ -8,17 +8,6 @@ abstract class CacheAbstract implements CacheStrategy
 {
     protected $ttl = 300;
 
-    public function fetch(string $key, callable $callable, ?int $ttl = null)
-    {
-        if (!$this->has($key)) {
-            $this->set($key, $value = call_user_func_array($callable, []), $ttl);
-        } else {
-            $value = $this->get($key);
-        }
-
-        return $value;
-    }
-
     public function hasMultiple(array $keys): bool
     {
         foreach ($keys as $key) {
@@ -67,6 +56,45 @@ abstract class CacheAbstract implements CacheStrategy
         }
 
         return $this;
+    }
+
+    public function remember(string $key, callable $callable, ?int $ttl = null)
+    {
+        if (!$this->has($key)) {
+            $this->set($key, $value = call_user_func_array($callable, []), $ttl);
+        } else {
+            $value = $this->get($key);
+        }
+
+        return $value;
+    }
+
+    public function increment(string $key, int $amount = 1)
+    {
+        $value = (int) $this->get($key);
+
+        return $this->set($key, $value + $amount);
+    }
+
+    public function decrement(string $key, int $amount = 1)
+    {
+        $value = (int) $this->get($key);
+
+        return $this->set($key, $value - $amount);
+    }
+
+    public function incrementFloat(string $key, float $amount = 1.0)
+    {
+        $value = (float) $this->get($key);
+
+        return $this->set($key, $value + $amount);
+    }
+
+    public function decrementFloat(string $key, float $amount = 1.0)
+    {
+        $value = (float) $this->get($key);
+
+        return $this->set($key, $value - $amount);
     }
 
     protected function getTTL(?int $ttl = null)

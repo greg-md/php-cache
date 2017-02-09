@@ -101,7 +101,7 @@ Below you can find a list of **supported methods**.
 * [delete](#delete) - Delete an item from the cache by its unique key;
 * [deleteMultiple](#deleteMultiple) - Delete multiple items from the cache by their unique keys;
 * [clear](#clear) - Clear the storage;
-* [fetch](#fetch) - Fetch a value from the cache and persist it if it is not present in that cache;
+* [remember](#remember) - Sometimes you may wish to retrieve an item from the cache, but also store a default value if the requested item doesn't exist;
 
 ## has
 
@@ -292,12 +292,12 @@ _Example:_
 $strategy->clear();
 ```
 
-## fetch
+## remember
 
-Fetch a value from the cache and persist it if it is not present in that cache.
+Sometimes you may wish to retrieve an item from the cache, but also store a default value if the requested item doesn't exist.
 
 ```php
-fetch(string $key, callable $callable, ?int $ttl = null): mixed
+remember(string $key, callable $callable, ?int $ttl = null): mixed
 ```
 
 `$key` - The unique key of this item in the cache;  
@@ -309,9 +309,85 @@ fetch(string $key, callable $callable, ?int $ttl = null): mixed
 _Example:_
 
 ```php
-$strategy->fetch('foo', function() {
+$strategy->remember('foo', function() {
     return 'FOO';
 });
+```
+
+## increment
+
+Increment a value.
+
+```php
+increment(string $key, int $amount = 1): $this
+```
+
+`$key` - The unique key of this item in the cache;  
+`$abount` - The amount to increment.
+
+_Example:_
+
+```php
+$strategy->increment('foo');
+
+$strategy->increment('foo', 10);
+```
+
+## decrement
+
+Decrement a value.
+
+```php
+decrement(string $key, int $amount = 1): $this
+```
+
+`$key` - The unique key of this item in the cache;  
+`$abount` - The amount to decrement.
+
+_Example:_
+
+```php
+$strategy->decrement('foo');
+
+$strategy->decrement('foo', 10);
+```
+
+## incrementFloat
+
+Increment a float value.
+
+```php
+incrementFloat(string $key, float $amount = 1.0): $this
+```
+
+`$key` - The unique key of this item in the cache;  
+`$abount` - The amount to increment.
+
+_Example:_
+
+```php
+$strategy->incrementFloat('foo');
+
+$strategy->incrementFloat('foo', 1.5);
+```
+
+## decrementFloat
+
+Decrement a float value.
+
+```php
+decrementFloat(string $key, float $amount = 1.0): $this
+```
+
+`$key` - The unique key of this item in the cache;  
+`$abount` - The amount to decrement.
+
+_Example:_
+
+```php
+$strategy->decrementFloat('foo');
+
+$strategy->decrementFloat('foo', 1.5);
 ```
 
 # License

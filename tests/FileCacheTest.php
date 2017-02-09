@@ -158,14 +158,14 @@ class FileCacheTest extends TestCase
     }
 
     /** @test */
-    public function it_fetches_a_key()
+    public function it_remembers_a_key()
     {
-        $this->cache->fetch('foo', function () {
+        $this->cache->remember('foo', function () {
             return 'FOO';
         });
 
         // Value is already registered and will not use the new one.
-        $value = $this->cache->fetch('foo', function () {
+        $value = $this->cache->remember('foo', function () {
             return 'FOO2';
         });
 

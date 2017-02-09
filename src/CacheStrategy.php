@@ -28,5 +28,13 @@ interface CacheStrategy
 
     public function clear();
 
-    public function fetch(string $key, callable $callable, ?int $ttl = null);
+    public function remember(string $key, callable $callable, ?int $ttl = null);
+
+    public function increment(string $key, int $amount = 1);
+
+    public function decrement(string $key, int $amount = 1);
+
+    public function incrementFloat(string $key, float $amount = 1.0);
+
+    public function decrementFloat(string $key, float $amount = 1.0);
 }

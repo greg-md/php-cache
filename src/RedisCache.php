@@ -65,4 +65,32 @@ class RedisCache extends CacheAbstract
 
         return $this;
     }
+
+    public function increment(string $key, int $amount = 1)
+    {
+        $this->adapter->incrBy($key, $amount);
+
+        return $this;
+    }
+
+    public function decrement(string $key, int $amount = 1)
+    {
+        $this->adapter->decrBy($key, $amount);
+
+        return $this;
+    }
+
+    public function incrementFloat(string $key, float $amount = 1.0)
+    {
+        $this->adapter->incrByFloat($key, $amount);
+
+        return $this;
+    }
+
+    public function decrementFloat(string $key, float $amount = 1.0)
+    {
+        $this->adapter->incrByFloat($key, -$amount);
+
+        return $this;
+    }
 }
