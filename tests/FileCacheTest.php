@@ -104,9 +104,9 @@ class FileCacheTest extends TestCase
     /** @test */
     public function it_sets_a_key_value_forever()
     {
-        $this->cache->setForever('foo', 'FOO');
+        $this->cache->forever('foo', 'FOO');
 
-        $this->cache->setMultipleForever(['bar' => 'BAR', 'baz' => 'BAZ']);
+        $this->cache->foreverMultiple(['bar' => 'BAR', 'baz' => 'BAZ']);
 
         $this->cache->collectGarbage();
 
