@@ -22,12 +22,12 @@ A better cache manager for web artisans.
 
 # Supported Drivers
 
-- Array - Use the PHP array as a storage;
-- Tmp - Use temporary files as a storage. They are automatically removed when script ends;
-- File - Use file based storage;
-- Memcached - Use Memcached driver as a storage;
-- Redis - Use Redis driver as a storage;
-- SQLite - Use SQLite database as a storage.
+- **Array** - Use the PHP array as a storage;
+- **Tmp** - Use temporary files as a storage. They are automatically removed when script ends;
+- **File** - Use file based storage;
+- **Memcached** - Use Memcached driver as a storage;
+- **Redis** - Use Redis driver as a storage;
+- **SQLite** - Use SQLite database as a storage.
 
 # How It Works
 
