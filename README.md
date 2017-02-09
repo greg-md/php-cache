@@ -64,22 +64,22 @@ $cache->register('container3', function() {
 });
 ```
 
-**Optionally**, you can define a default strategy to be used by the cache manager.
+**Optionally**, you can define a default store to be used by the cache manager.
 
 ```php
-$cache->defaultStrategy('container2');
+$cache->setDefaultStoreName('container2');
 ```
 
 **Then**, you can **set** or **get** some data:
 
 ```php
 // Add some data in "container1"
-$cache->strategy('container1')->set('foo', 'FOO');
+$cache->store('container1')->set('foo', 'FOO');
 
-// Add some data in default strategy, which is "container2"
+// Add some data in default store, which is "container2"
 $cache->set('bar', 'BAR');
 
-// Get "bar" value from default strategy.
+// Get "bar" value from default store.
 $value = $cache->get('bar'); // result: BAR
 ```
 
