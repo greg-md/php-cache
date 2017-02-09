@@ -234,6 +234,10 @@ _Example:_
 
 ```php
 $strategy->forever('foo', 'FOO');
+
+// or
+
+$strategy->set('foo', 'FOO', 0);
 ```
 
 ## foreverMultiple
@@ -250,6 +254,10 @@ _Example:_
 
 ```php
 $strategy->foreverMultiple(['foo' => 'FOO', 'bar' => 'BAR']);
+
+// or
+
+$strategy->setMultiple(['foo' => 'FOO', 'bar' => 'BAR'], 0);
 ```
 
 ## delete
