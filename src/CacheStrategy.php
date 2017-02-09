@@ -38,5 +38,7 @@ interface CacheStrategy
 
     public function decrementFloat(string $key, float $amount = 1.0, ?int $ttl = null);
 
-    public function touch($key, ?int $ttl = null);
+    public function touch(string $key, ?int $ttl = null);
+
+    public function pull(string $key, $default = null);
 }

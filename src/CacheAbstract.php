@@ -97,9 +97,18 @@ abstract class CacheAbstract implements CacheStrategy
         return $this->set($key, $value - $amount, $ttl);
     }
 
-    public function touch($key, ?int $ttl = null)
+    public function touch(string $key, ?int $ttl = null)
     {
         $this->set($key, $this->get($key), $ttl);
+    }
+
+    public function pull(string $key, $default = null)
+    {
+        $value = $this->get($key, $default);
+
+        $this->delete($key);
+
+        return $value;
     }
 
     protected function getTTL(?int $ttl = null)

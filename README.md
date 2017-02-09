@@ -107,6 +107,7 @@ Below you can find a list of **supported methods**.
 * [incrementFloat](#incrementfloat) - Increment a float value;
 * [decrementFloat](#decrementfloat) - Decrement a float value;
 * [touch](#touch) - Set a new expiration on an item;
+* [pull](#pull) - Retrieve and delete an item from the cache.
 
 ## has
 
@@ -424,6 +425,27 @@ _Example:_
 
 ```php
 $strategy->touch('foo', 100);
+```
+
+## pull
+
+Retrieve and delete an item from the cache.
+
+```php
+pull(string $key, $default = null): mixed
+```
+
+`$key` - The unique key of this item in the cache;  
+`$default` - Default value to return for keys that do not exist.
+
+Return the value of the item from the cache, or `$default` in case of cache miss.
+
+_Example:_
+
+```php
+$strategy->pull('foo'); // return foo value
+
+$strategy->pull('foo'); // return null
 ```
 
 # License
