@@ -105,16 +105,16 @@ class CacheManager implements CacheStrategy
         return $this;
     }
 
-    public function setForever(string $key, $value)
+    public function forever(string $key, $value)
     {
-        $this->store()->setForever($key, $value);
+        $this->store()->forever($key, $value);
 
         return $this;
     }
 
-    public function setMultipleForever(array $values)
+    public function foreverMultiple(array $values)
     {
-        $this->store()->setMultipleForever($values);
+        $this->store()->foreverMultiple($values);
 
         return $this;
     }

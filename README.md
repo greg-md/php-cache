@@ -96,8 +96,8 @@ Below you can find a list of **supported methods**.
 * [getMultiple](#getmultiple) - Obtains multiple cache items by their unique keys;
 * [set](#set) - Persists data in the cache, uniquely referenced by a key with an optional expiration TTL time;
 * [setMultiple](#setmultiple) - Persists a set of `key => value` pairs in the cache, with an optional TTL;
-* [setForever](#setforever) - Persists data in the cache, forever, uniquely referenced by a key;
-* [setMultipleForever](#setmultipleforever) - Persists a set of `key => value` pairs in the cache, forever;
+* [forever](#forever) - Persists forever data in the cache, uniquely referenced by a key;
+* [foreverMultiple](#forevermultiple) - Persists forever a set of `key => value` pairs in the cache;
 * [delete](#delete) - Delete an item from the cache by its unique key;
 * [deleteMultiple](#deletemultiple) - Delete multiple items from the cache by their unique keys;
 * [clear](#clear) - Clear the storage;
@@ -219,12 +219,12 @@ _Example:_
 $strategy->setMultiple(['foo' => 'FOO', 'bar' => 'BAR']);
 ```
 
-## setForever
+## forever
 
-Persists data in the cache, forever, uniquely referenced by a key.
+Persists forever data in the cache, uniquely referenced by a key.
 
 ```php
-setForever(string $key, $value): $this
+forever(string $key, $value): $this
 ```
 
 `$key` - The key of the item to store;  
@@ -233,15 +233,15 @@ setForever(string $key, $value): $this
 _Example:_
 
 ```php
-$strategy->setForever('foo', 'FOO');
+$strategy->forever('foo', 'FOO');
 ```
 
-## setMultipleForever
+## foreverMultiple
 
-Persists a set of `key => value` pairs in the cache, forever.
+Persists forever a set of `key => value` pairs in the cache.
 
 ```php
-setMultipleForever(array $values): $this
+foreverMultiple(array $values): $this
 ```
 
 `$values` - A list of `key => value` pairs for a multiple-set operation.
@@ -249,7 +249,7 @@ setMultipleForever(array $values): $this
 _Example:_
 
 ```php
-$strategy->setMultipleForever(['foo' => 'FOO', 'bar' => 'BAR']);
+$strategy->foreverMultiple(['foo' => 'FOO', 'bar' => 'BAR']);
 ```
 
 ## delete

@@ -18,9 +18,9 @@ interface CacheStrategy
 
     public function setMultiple(array $values, ?int $ttl = null);
 
-    public function setForever(string $key, $value);
+    public function forever(string $key, $value);
 
-    public function setMultipleForever(array $values);
+    public function foreverMultiple(array $values);
 
     public function delete(string $key);
 
@@ -41,4 +41,6 @@ interface CacheStrategy
     public function touch(string $key, ?int $ttl = null);
 
     public function pull(string $key, $default = null);
+
+    public function add(string $key, $value, ?int $ttl = null): bool;
 }

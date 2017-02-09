@@ -39,7 +39,7 @@ abstract class CacheAbstract implements CacheStrategy
         return $this;
     }
 
-    public function setForever(string $key, $value)
+    public function forever(string $key, $value)
     {
         return $this->set($key, $value, 0);
     }
@@ -100,6 +100,17 @@ abstract class CacheAbstract implements CacheStrategy
     public function touch(string $key, ?int $ttl = null)
     {
         $this->set($key, $this->get($key), $ttl);
+    }
+
+    public function add(string $key, $value, ?int $ttl = null): bool
+    {
+        if ($this->has($key)) {
+            return false;
+        }
+
+        $this->set($key, $value, $ttl);
+
+        return true;
     }
 
     public function pull(string $key, $default = null)
