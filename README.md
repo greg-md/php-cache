@@ -45,17 +45,17 @@ In the next example we will use a cache manager.
 $cache = new \Greg\Cache\CacheManager();
 
 // Register a file cache
-$cache->registerStrategy('container1', new \Greg\Cache\FileCache(__DIR__ . '/storage'));
+$cache->registerStrategy('store1', new \Greg\Cache\FileCache(__DIR__ . '/storage'));
 
 // Register a sqlite cache
-$cache->register('container2', function() {
-    $pdo = new \PDO('sqlite:' . __DIR__ . '/storage/container2.sqlite');
+$cache->register('store2', function() {
+    $pdo = new \PDO('sqlite:' . __DIR__ . '/storage/store2.sqlite');
 
     return new \Greg\Cache\SqliteCache($pdo);
 });
 
 // Register a redis cache
-$cache->register('container3', function() {
+$cache->register('store3', function() {
     $redis = new \Redis();
 
     $redis->connect('127.0.0.1');
@@ -67,16 +67,16 @@ $cache->register('container3', function() {
 **Optionally**, you can define a default store to be used by the cache manager.
 
 ```php
-$cache->setDefaultStoreName('container2');
+$cache->setDefaultStoreName('store2');
 ```
 
 **Then**, you can **set** or **get** some data:
 
 ```php
-// Add some data in "container1"
-$cache->store('container1')->set('foo', 'FOO');
+// Add some data in "store1"
+$cache->store('store1')->set('foo', 'FOO');
 
-// Add some data in default store, which is "container2"
+// Add some data in default store, which is "store2"
 $cache->set('bar', 'BAR');
 
 // Get "bar" value from default store.
