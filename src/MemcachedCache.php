@@ -33,6 +33,8 @@ class MemcachedCache extends CacheAbstract
 
     public function set(string $key, $value, ?int $ttl = null)
     {
+        $ttl = $this->getTTL($ttl);
+
         $this->adapter->set($key, serialize($value), $ttl ? time() + $ttl : 0);
 
         return $this;
@@ -52,16 +54,25 @@ class MemcachedCache extends CacheAbstract
         return $this;
     }
 
-    public function increment(string $key, int $amount = 1)
+    public function increment(string $key, int $amount = 1, ?int $ttl = null)
     {
         $this->adapter->increment($key, $amount);
 
         return $this;
     }
 
-    public function decrement(string $key, int $amount = 1)
+    public function decrement(string $key, int $amount = 1, ?int $ttl = null)
     {
         $this->adapter->decrement($key, $amount);
+
+        return $this;
+    }
+
+    public function touch($key, ?int $ttl = null)
+    {
+        $ttl = $this->getTTL($ttl);
+
+        $this->adapter->touch($key, $ttl ? time() + $ttl : 0);
 
         return $this;
     }

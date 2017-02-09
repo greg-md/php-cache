@@ -99,9 +99,14 @@ Below you can find a list of **supported methods**.
 * [setForever](#setforever) - Persists data in the cache, forever, uniquely referenced by a key;
 * [setMultipleForever](#setmultipleforever) - Persists a set of `key => value` pairs in the cache, forever;
 * [delete](#delete) - Delete an item from the cache by its unique key;
-* [deleteMultiple](#deleteMultiple) - Delete multiple items from the cache by their unique keys;
+* [deleteMultiple](#deletemultiple) - Delete multiple items from the cache by their unique keys;
 * [clear](#clear) - Clear the storage;
 * [remember](#remember) - Sometimes you may wish to retrieve an item from the cache, but also store a default value if the requested item doesn't exist;
+* [increment](#increment) - Increment a value;
+* [decrement](#decrement) - Decrement a value;
+* [incrementFloat](#incrementfloat) - Increment a float value;
+* [decrementFloat](#decrementfloat) - Decrement a float value;
+* [touch](#touch) - Set a new expiration on an item;
 
 ## has
 
@@ -304,7 +309,7 @@ remember(string $key, callable $callable, ?int $ttl = null): mixed
 `$callable` - The value callable of the item to store when the key is not present in the cache. The value must be serializable;  
 `$ttl` - Optional. The TTL value of this item. If no value is sent and
             the driver supports TTL then the library may set a default value
-            for it or let the driver take care of that.  
+            for it or let the driver take care of that.
 
 _Example:_
 
@@ -319,11 +324,14 @@ $strategy->remember('foo', function() {
 Increment a value.
 
 ```php
-increment(string $key, int $amount = 1): $this
+increment(string $key, int $amount = 1, ?int $ttl = null): $this
 ```
 
 `$key` - The unique key of this item in the cache;  
-`$abount` - The amount to increment.
+`$abount` - The amount to increment;  
+`$ttl` - Optional. The TTL value of this item. If no value is sent and
+            the driver supports TTL then the library may set a default value
+            for it or let the driver take care of that.
 
 _Example:_
 
@@ -338,11 +346,14 @@ $strategy->increment('foo', 10);
 Decrement a value.
 
 ```php
-decrement(string $key, int $amount = 1): $this
+decrement(string $key, int $amount = 1, ?int $ttl = null): $this
 ```
 
 `$key` - The unique key of this item in the cache;  
-`$abount` - The amount to decrement.
+`$abount` - The amount to decrement;  
+`$ttl` - Optional. The TTL value of this item. If no value is sent and
+            the driver supports TTL then the library may set a default value
+            for it or let the driver take care of that.
 
 _Example:_
 
@@ -357,11 +368,14 @@ $strategy->decrement('foo', 10);
 Increment a float value.
 
 ```php
-incrementFloat(string $key, float $amount = 1.0): $this
+incrementFloat(string $key, float $amount = 1.0, ?int $ttl = null): $this
 ```
 
 `$key` - The unique key of this item in the cache;  
-`$abount` - The amount to increment.
+`$abount` - The amount to increment;  
+`$ttl` - Optional. The TTL value of this item. If no value is sent and
+            the driver supports TTL then the library may set a default value
+            for it or let the driver take care of that.
 
 _Example:_
 
@@ -376,11 +390,14 @@ $strategy->incrementFloat('foo', 1.5);
 Decrement a float value.
 
 ```php
-decrementFloat(string $key, float $amount = 1.0): $this
+decrementFloat(string $key, float $amount = 1.0, ?int $ttl = null): $this
 ```
 
 `$key` - The unique key of this item in the cache;  
-`$abount` - The amount to decrement.
+`$abount` - The amount to decrement;  
+`$ttl` - Optional. The TTL value of this item. If no value is sent and
+            the driver supports TTL then the library may set a default value
+            for it or let the driver take care of that.
 
 _Example:_
 
@@ -388,6 +405,25 @@ _Example:_
 $strategy->decrementFloat('foo');
 
 $strategy->decrementFloat('foo', 1.5);
+```
+
+## touch
+
+Set a new expiration on an item.
+
+```php
+touch(string $key, ?int $ttl = null): $this
+```
+
+`$key` - The unique key of this item in the cache;  
+`$ttl` - Optional. The TTL value of this item. If no value is sent and
+            the driver supports TTL then the library may set a default value
+            for it or let the driver take care of that.
+
+_Example:_
+
+```php
+$strategy->touch('foo', 100);
 ```
 
 # License

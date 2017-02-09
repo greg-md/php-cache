@@ -69,32 +69,37 @@ abstract class CacheAbstract implements CacheStrategy
         return $value;
     }
 
-    public function increment(string $key, int $amount = 1)
+    public function increment(string $key, int $amount = 1, ?int $ttl = null)
     {
         $value = (int) $this->get($key);
 
-        return $this->set($key, $value + $amount);
+        return $this->set($key, $value + $amount, $ttl);
     }
 
-    public function decrement(string $key, int $amount = 1)
+    public function decrement(string $key, int $amount = 1, ?int $ttl = null)
     {
         $value = (int) $this->get($key);
 
-        return $this->set($key, $value - $amount);
+        return $this->set($key, $value - $amount, $ttl);
     }
 
-    public function incrementFloat(string $key, float $amount = 1.0)
+    public function incrementFloat(string $key, float $amount = 1.0, ?int $ttl = null)
     {
         $value = (float) $this->get($key);
 
-        return $this->set($key, $value + $amount);
+        return $this->set($key, $value + $amount, $ttl);
     }
 
-    public function decrementFloat(string $key, float $amount = 1.0)
+    public function decrementFloat(string $key, float $amount = 1.0, ?int $ttl = null)
     {
         $value = (float) $this->get($key);
 
-        return $this->set($key, $value - $amount);
+        return $this->set($key, $value - $amount, $ttl);
+    }
+
+    public function touch($key, ?int $ttl = null)
+    {
+        $this->set($key, $this->get($key), $ttl);
     }
 
     protected function getTTL(?int $ttl = null)

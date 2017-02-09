@@ -66,30 +66,49 @@ class RedisCache extends CacheAbstract
         return $this;
     }
 
-    public function increment(string $key, int $amount = 1)
+    public function increment(string $key, int $amount = 1, ?int $ttl = null)
     {
         $this->adapter->incrBy($key, $amount);
 
+        $this->touch($key, $ttl);
+
         return $this;
     }
 
-    public function decrement(string $key, int $amount = 1)
+    public function decrement(string $key, int $amount = 1, ?int $ttl = null)
     {
         $this->adapter->decrBy($key, $amount);
 
+        $this->touch($key, $ttl);
+
         return $this;
     }
 
-    public function incrementFloat(string $key, float $amount = 1.0)
+    public function incrementFloat(string $key, float $amount = 1.0, ?int $ttl = null)
     {
         $this->adapter->incrByFloat($key, $amount);
 
+        $this->touch($key, $ttl);
+
         return $this;
     }
 
-    public function decrementFloat(string $key, float $amount = 1.0)
+    public function decrementFloat(string $key, float $amount = 1.0, ?int $ttl = null)
     {
         $this->adapter->incrByFloat($key, -$amount);
+
+        $this->touch($key, $ttl);
+
+        return $this;
+    }
+
+    public function touch($key, ?int $ttl = null)
+    {
+        if ($ttl = $this->getTTL($ttl)) {
+            $this->adapter->expire($key, $ttl);
+        } else {
+            $this->adapter->persist($key);
+        }
 
         return $this;
     }

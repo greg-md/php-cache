@@ -30,11 +30,13 @@ interface CacheStrategy
 
     public function remember(string $key, callable $callable, ?int $ttl = null);
 
-    public function increment(string $key, int $amount = 1);
+    public function increment(string $key, int $amount = 1, ?int $ttl = null);
 
-    public function decrement(string $key, int $amount = 1);
+    public function decrement(string $key, int $amount = 1, ?int $ttl = null);
 
-    public function incrementFloat(string $key, float $amount = 1.0);
+    public function incrementFloat(string $key, float $amount = 1.0, ?int $ttl = null);
 
-    public function decrementFloat(string $key, float $amount = 1.0);
+    public function decrementFloat(string $key, float $amount = 1.0, ?int $ttl = null);
+
+    public function touch($key, ?int $ttl = null);
 }
