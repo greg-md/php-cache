@@ -102,7 +102,7 @@ class RedisCache extends CacheAbstract
         return $this;
     }
 
-    public function touch($key, ?int $ttl = null)
+    public function touch(string $key, ?int $ttl = null)
     {
         if ($ttl = $this->getTTL($ttl)) {
             $this->adapter->expire($key, $ttl);
