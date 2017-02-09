@@ -27,7 +27,7 @@ A better cache manager for web artisans.
 - **File** - Use file based storage;
 - **Memcached** - Use Memcached driver as a storage;
 - **Redis** - Use Redis driver as a storage;
-- **SQLite** - Use SQLite database as a storage.
+- **Sqlite** - Use Sqlite database as a storage.
 
 # How It Works
 
