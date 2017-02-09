@@ -6,13 +6,13 @@ namespace Greg\Cache;
 
 class FileCache extends CacheAbstract
 {
+    private const EXTENSION = '.cache.txt';
+
     private $path;
 
     private $gcProbability;
 
     private $gcDivisor;
-
-    private $extension = '.cache.txt';
 
     public function __construct(string $path, int $ttl = 300, int $gcProbability = 1, int $gcDivisor = 100)
     {
@@ -45,9 +45,7 @@ class FileCache extends CacheAbstract
         $has = true;
 
         foreach ($keys as $key) {
-            if ($this->isKeyExpired($key)) {
-                $this->deleteKey($key);
-
+            if (!$this->has($key)) {
                 $has = false;
             }
         }
@@ -90,7 +88,7 @@ class FileCache extends CacheAbstract
 
     public function clear()
     {
-        $files = glob($this->path . DIRECTORY_SEPARATOR . '*' . $this->extension);
+        $files = glob($this->path . DIRECTORY_SEPARATOR . '*' . self::EXTENSION);
 
         foreach ($files as $file) {
             unlink($file);
@@ -101,7 +99,7 @@ class FileCache extends CacheAbstract
 
     public function collectGarbage()
     {
-        $files = glob($this->path . DIRECTORY_SEPARATOR . '*' . $this->extension);
+        $files = glob($this->path . DIRECTORY_SEPARATOR . '*' . self::EXTENSION);
 
         foreach ($files as $file) {
             $ttl = $this->getFileTTL($file);
@@ -133,7 +131,7 @@ class FileCache extends CacheAbstract
 
     protected function getFile(string $key): string
     {
-        return $this->path . DIRECTORY_SEPARATOR . md5($key) . $this->extension;
+        return $this->path . DIRECTORY_SEPARATOR . md5($key) . self::EXTENSION;
     }
 
     protected function getNewFile(string $key)

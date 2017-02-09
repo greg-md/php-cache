@@ -25,6 +25,8 @@ A better cache manager for web artisans.
 - File
 - SQLite
 - Redis
+- Array
+- InMemory
 
 # How It Works
 

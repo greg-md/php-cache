@@ -51,15 +51,17 @@ class RedisCache extends CacheAbstract
 
     public function clear()
     {
-        $prefix = $this->adapter->getOption(\Redis::OPT_PREFIX);
-
         $keys = $this->adapter->keys('*');
 
-        $this->adapter->setOption(\Redis::OPT_PREFIX, '');
+        if ($prefix = $this->adapter->getOption(\Redis::OPT_PREFIX)) {
+            $this->adapter->setOption(\Redis::OPT_PREFIX, '');
 
-        $this->adapter->delete($keys);
+            $this->adapter->delete($keys);
 
-        $this->adapter->setOption(\Redis::OPT_PREFIX, $prefix);
+            $this->adapter->setOption(\Redis::OPT_PREFIX, $prefix);
+        } else {
+            $this->adapter->delete($keys);
+        }
 
         return $this;
     }
