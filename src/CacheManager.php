@@ -142,6 +142,49 @@ class CacheManager implements CacheStrategy
 
     public function remember(string $key, callable $callable, ?int $ttl = null)
     {
-        return $this->store()->fetch($key, $callable, $ttl);
+        return $this->store()->remember($key, $callable, $ttl);
+    }
+
+    public function increment(string $key, int $amount = 1, ?int $ttl = null)
+    {
+        $this->store()->increment($key, $amount, $ttl);
+
+        return $this;
+    }
+
+    public function decrement(string $key, int $amount = 1, ?int $ttl = null)
+    {
+        $this->store()->decrement($key, $amount, $ttl);
+    }
+
+    public function incrementFloat(string $key, float $amount = 1.0, ?int $ttl = null)
+    {
+        $this->store()->incrementFloat($key, $amount, $ttl);
+
+        return $this;
+    }
+
+    public function decrementFloat(string $key, float $amount = 1.0, ?int $ttl = null)
+    {
+        $this->store()->decrementFloat($key, $amount, $ttl);
+
+        return $this;
+    }
+
+    public function touch(string $key, ?int $ttl = null)
+    {
+        $this->store()->touch($key, $ttl);
+
+        return $this;
+    }
+
+    public function pull(string $key, $default = null)
+    {
+        return $this->store()->pull($key, $default);
+    }
+
+    public function add(string $key, $value, ?int $ttl = null): bool
+    {
+        return $this->store()->add($key, $value, $ttl);
     }
 }
