@@ -44,17 +44,17 @@ In the next example we will use a cache manager.
 ```php
 $cache = new \Greg\Cache\CacheManager();
 
-// Register file cache
+// Register a file cache
 $cache->registerStrategy('container1', new \Greg\Cache\FileCache(__DIR__ . '/storage'));
 
-// Register sqlite cache
+// Register a sqlite cache
 $cache->register('container2', function() {
     $pdo = new \PDO('sqlite:' . __DIR__ . '/storage/container2.sqlite');
 
     return new \Greg\Cache\SqliteCache($pdo);
 });
 
-// Register redis cache
+// Register a redis cache
 $cache->register('container3', function() {
     $redis = new \Redis();
 
