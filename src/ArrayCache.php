@@ -62,7 +62,7 @@ class ArrayCache extends CacheAbstract
     {
         $this->storage[$key] = [
             'ExpireAt' => $this->getExpiresAt($ttl),
-            'Value' => $value,
+            'Value'    => $value,
         ];
 
         return $this;
