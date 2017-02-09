@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Greg\Cache;
 
-class ArrayCache extends CacheAbstract
+class TmpCache extends CacheAbstract
 {
     private $storage = [];
 
@@ -17,11 +17,15 @@ class ArrayCache extends CacheAbstract
 
     public function has(string $key): bool
     {
-        if (!$item = $this->storage[$key] ?? null) {
+        if (!$file = $this->storage[$key] ?? null) {
             return false;
         }
 
-        if ($this->isExpired($item['ExpireAt'])) {
+        fseek($file, 0);
+
+        $ttl = (int) trim(fgets($file));
+
+        if ($this->isExpired($ttl)) {
             $this->delete($key);
 
             return false;
@@ -45,25 +49,32 @@ class ArrayCache extends CacheAbstract
 
     public function get(string $key, $default = null)
     {
-        if (!$item = $this->storage[$key] ?? null) {
-            return false;
+        if (!$file = $this->storage[$key] ?? null) {
+            return $default;
         }
 
-        if ($this->isExpired($item['ExpireAt'])) {
+        fseek($file, 0);
+
+        $ttl = (int) trim(fgets($file));
+
+        if ($this->isExpired($ttl)) {
             $this->delete($key);
 
             return $default;
         }
 
-        return unserialize($item['Value']);
+        $value = trim(fgets($file));
+
+        return unserialize($value);
     }
 
     public function set(string $key, $value, ?int $ttl = null)
     {
-        $this->storage[$key] = [
-            'ExpireAt' => $this->getExpiresAt($ttl),
-            'Value'    => $value,
-        ];
+        $file = tmpfile();
+
+        fwrite($file, $this->getExpiresAt($ttl) . PHP_EOL . $value);
+
+        $this->storage[$key] = $file;
 
         return $this;
     }

@@ -6,13 +6,17 @@ namespace Greg\Cache;
 
 class SqliteCache extends CacheAbstract
 {
+    private $tableName;
+
     private $adapter;
 
-    public function __construct(\PDO $adapter, int $ttl = 300)
+    public function __construct(\PDO $adapter, int $ttl = 300, $tableName = 'Cache')
     {
         $this->adapter = $adapter;
 
         $this->ttl = $this->validateTTL($ttl);
+
+        $this->tableName = $tableName;
 
         $this->checkAndBuildStructure();
 
@@ -21,7 +25,7 @@ class SqliteCache extends CacheAbstract
 
     public function has(string $key): bool
     {
-        $stmt = $this->adapter->prepare('SELECT ExpiresAt FROM Cache WHERE Key = :Key');
+        $stmt = $this->adapter->prepare("SELECT ExpiresAt FROM {$this->tableName} WHERE Key = :Key");
 
         $stmt->bindValue(':Key', $key);
 
@@ -44,7 +48,7 @@ class SqliteCache extends CacheAbstract
 
     public function hasMultiple(array $keys): bool
     {
-        $stmt = $this->adapter->prepare('SELECT Key, ExpiresAt FROM Cache WHERE Key IN (' . $this->stmtKeys($keys) . ')');
+        $stmt = $this->adapter->prepare("SELECT Key, ExpiresAt FROM {$this->tableName} WHERE Key IN ({$this->stmtKeys($keys)})");
 
         $this->stmtBindKeys($stmt, $keys);
 
@@ -73,7 +77,7 @@ class SqliteCache extends CacheAbstract
 
     public function get(string $key, $default = null)
     {
-        $stmt = $this->adapter->prepare('SELECT Value, ExpiresAt FROM Cache WHERE Key = :Key');
+        $stmt = $this->adapter->prepare("SELECT Value, ExpiresAt FROM {$this->tableName} WHERE Key = :Key");
 
         $stmt->bindValue(':Key', $key);
 
@@ -94,7 +98,7 @@ class SqliteCache extends CacheAbstract
 
     public function getMultiple(array $keys, $default = null)
     {
-        $stmt = $this->adapter->prepare('SELECT Key, Value, ExpiresAt FROM Cache WHERE Key IN (' . $this->stmtKeys($keys) . ')');
+        $stmt = $this->adapter->prepare("SELECT Key, Value, ExpiresAt FROM {$this->tableName} WHERE Key IN ({$this->stmtKeys($keys)})");
 
         $this->stmtBindKeys($stmt, $keys);
 
@@ -132,9 +136,9 @@ class SqliteCache extends CacheAbstract
     public function set(string $key, $value, ?int $ttl = null)
     {
         if ($this->has($key)) {
-            $stmt = $this->adapter->prepare('UPDATE Cache SET Value = :Value, ExpiresAt = :ExpiresAt WHERE Key = :Key');
+            $stmt = $this->adapter->prepare("UPDATE {$this->tableName} SET Value = :Value, ExpiresAt = :ExpiresAt WHERE Key = :Key");
         } else {
-            $stmt = $this->adapter->prepare('INSERT INTO Cache(Key, Value, ExpiresAt) VALUES (:Key, :Value, :ExpiresAt)');
+            $stmt = $this->adapter->prepare("INSERT INTO {$this->tableName}(Key, Value, ExpiresAt) VALUES (:Key, :Value, :ExpiresAt)");
         }
 
         $stmt->bindValue(':Key', $key);
@@ -150,7 +154,7 @@ class SqliteCache extends CacheAbstract
 
     public function delete(string $key)
     {
-        $stmt = $this->adapter->prepare('DELETE FROM Cache WHERE Key = :Key');
+        $stmt = $this->adapter->prepare("DELETE FROM {$this->tableName} WHERE Key = :Key");
 
         $stmt->bindValue(':Key', $key);
 
@@ -161,7 +165,7 @@ class SqliteCache extends CacheAbstract
 
     public function deleteMultiple(array $keys)
     {
-        $stmt = $this->adapter->prepare('DELETE FROM Cache WHERE Key IN (' . $this->stmtKeys($keys) . ')');
+        $stmt = $this->adapter->prepare("DELETE FROM {$this->tableName} WHERE Key IN ({$this->stmtKeys($keys)})");
 
         $this->stmtBindKeys($stmt, $keys);
 
@@ -172,23 +176,23 @@ class SqliteCache extends CacheAbstract
 
     public function clear()
     {
-        $this->adapter->exec('DELETE FROM Cache');
+        $this->adapter->exec("DELETE FROM {$this->tableName}");
 
         return $this;
     }
 
     protected function structureExists(): bool
     {
-        $stmt = $this->adapter->query('SELECT 1 FROM sqlite_master WHERE type = "table" and name = "Cache"');
+        $stmt = $this->adapter->query("SELECT 1 FROM sqlite_master WHERE type = 'table' and name = '{$this->tableName}'");
 
         return $stmt->fetch() ? true : false;
     }
 
     protected function buildStructure()
     {
-        $this->adapter->exec('CREATE TABLE Cache (Key VARCHAR(255) PRIMARY KEY, Value BLOB, ExpiresAt INTEGER)');
+        $this->adapter->exec("CREATE TABLE {$this->tableName} (Key VARCHAR(255) PRIMARY KEY, Value BLOB, ExpiresAt INTEGER)");
 
-        $this->adapter->exec('CREATE INDEX CacheExpiresAt ON Cache(ExpiresAt)');
+        $this->adapter->exec("CREATE INDEX {$this->tableName}ExpiresAt ON {$this->tableName}(ExpiresAt)");
 
         return $this;
     }
