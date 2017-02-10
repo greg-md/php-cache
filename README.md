@@ -15,6 +15,8 @@ A better cache manager for web artisans.
 * [Supported Drivers](#supported-drivers)
 * [How It Works](#how-it-works)
 * [Cache Strategy](#cache-strategy)
+* [License](#license)
+* [Huuuge Quote](#huuuge-quote)
 
 # Requirements
 
@@ -484,3 +486,7 @@ $strategy->add('foo', 'FOO2'); // return false
 # License
 
 MIT © [Grigorii Duca](http://greg.md)
+
+# Huuuge Quote
+
+![I fear not the man who has practiced 10,000 programming languages once, but I fear the man who has practiced one programming language 10,000 times. &copy; #horrorsquad](http://greg.md/huuuge-quote-fb.jpg)
