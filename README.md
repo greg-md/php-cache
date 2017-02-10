@@ -9,7 +9,7 @@
 
 A better cache manager for web artisans.
 
-# Table of contents:
+# Table of Contents:
 
 * [Requirements](#requirements)
 * [Supported Drivers](#supported-drivers)
