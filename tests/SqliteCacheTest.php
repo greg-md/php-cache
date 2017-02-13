@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Greg\Cache\Tests;
 
 use Greg\Cache\SqliteCache;
