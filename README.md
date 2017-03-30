@@ -33,7 +33,7 @@ A better cache manager for web artisans.
 
 # How It Works
 
-Where are two ways of working with cache strategies.
+There are two ways of working with cache strategies.
 Directly or via a cache manager.
 
 > A cache manager could have many cache strategies and a default one.
@@ -44,20 +44,20 @@ In the next example we will use a cache manager.
 **First of all**, you have to initialize a cache manager and register some strategies:
 
 ```php
-$cache = new \Greg\Cache\CacheManager();
+$manager = new \Greg\Cache\CacheManager();
 
 // Register a file cache
-$cache->registerStrategy('store1', new \Greg\Cache\FileCache(__DIR__ . '/storage'));
+$manager->registerStrategy('store1', new \Greg\Cache\FileCache(__DIR__ . '/storage'));
 
 // Register a sqlite cache
-$cache->register('store2', function() {
+$manager->register('store2', function() {
     $pdo = new \PDO('sqlite:' . __DIR__ . '/storage/store2.sqlite');
 
     return new \Greg\Cache\SqliteCache($pdo);
 });
 
 // Register a redis cache
-$cache->register('store3', function() {
+$manager->register('store3', function() {
     $redis = new \Redis();
 
     $redis->connect('127.0.0.1');
@@ -69,20 +69,20 @@ $cache->register('store3', function() {
 **Optionally**, you can define a default store to be used by the cache manager.
 
 ```php
-$cache->setDefaultStoreName('store2');
+$manager->setDefaultStoreName('store2');
 ```
 
 **Then**, you can **set** or **get** some data:
 
 ```php
 // Add some data in "store1"
-$cache->store('store1')->set('foo', 'FOO');
+$manager->store('store1')->set('foo', 'FOO');
 
 // Add some data in default store, which is "store2"
-$cache->set('bar', 'BAR');
+$manager->set('bar', 'BAR');
 
 // Get "bar" value from default store.
-$value = $cache->get('bar'); // result: BAR
+$value = $manager->get('bar'); // result: BAR
 ```
 
 # Cache Strategy
