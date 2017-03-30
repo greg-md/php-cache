@@ -66,7 +66,7 @@ class CacheManager implements CacheStrategy
             $this->stores[$name] = $strategy;
         }
 
-        return $this->get($name);
+        return $this->stores[$name];
     }
 
     public function has(string $key): bool
