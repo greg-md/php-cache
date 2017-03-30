@@ -59,7 +59,7 @@ abstract class CacheAbstract implements CacheStrategy
     public function remember(string $key, callable $callable, ?int $ttl = null)
     {
         if (!$this->has($key)) {
-            $this->set($key, $value = call_user_func_array($callable, []), $ttl);
+            $this->set($key, $value = call_user_func_array($callable, [$this]), $ttl);
         } else {
             $value = $this->get($key);
         }

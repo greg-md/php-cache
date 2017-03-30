@@ -314,7 +314,7 @@ $strategy->clear();
 Sometimes you may wish to retrieve an item from the cache, but also store a default value if the requested item doesn't exist.
 
 ```php
-remember(string $key, callable $callable, ?int $ttl = null): mixed
+remember(string $key, callable($this): mixed $callable, ?int $ttl = null): mixed
 ```
 
 `$key` - The unique key of this item in the cache;  
