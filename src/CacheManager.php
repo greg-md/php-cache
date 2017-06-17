@@ -10,7 +10,7 @@ class CacheManager implements CacheStrategy
 
     public function setDefaultStoreName(string $name)
     {
-        if (isset($this->stores[$name])) {
+        if (!isset($this->stores[$name])) {
             throw new \Exception('Store `' . $name . '` was not defined.');
         }
 
