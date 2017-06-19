@@ -152,12 +152,14 @@ abstract class CacheAbstract implements CacheStrategy
 
     protected function serialize($value)
     {
-        if (ctype_digit((string) $value)) {
-            return (int) $value;
-        }
+        if (is_scalar($value)) {
+            if (ctype_digit((string) $value)) {
+                return (int) $value;
+            }
 
-        if (is_numeric((string) $value)) {
-            return (float) $value;
+            if (is_numeric((string) $value)) {
+                return (float) $value;
+            }
         }
 
         return serialize($value);
