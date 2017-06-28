@@ -7,7 +7,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/greg-md/php-cache/v/unstable.svg)](https://packagist.org/packages/greg-md/php-cache)
 [![License](https://poser.pugx.org/greg-md/php-cache/license.svg)](https://packagist.org/packages/greg-md/php-cache)
 
-A better cache manager for web artisans.
+A powerful Cache Manager for PHP.
 
 # Table of Contents:
 
