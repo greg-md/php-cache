@@ -2,7 +2,6 @@
 
 namespace Greg\Cache;
 
-use Greg\Support\Dir;
 use PHPUnit\Framework\TestCase;
 
 class FileCacheTest extends TestCase
@@ -16,14 +15,18 @@ class FileCacheTest extends TestCase
 
     public function setUp()
     {
-        Dir::make($this->storage);
+        mkdir($this->storage, 0777);
 
         $this->cache = new FileCache($this->storage, 300, 1, 1);
     }
 
     public function tearDown()
     {
-        Dir::unlink($this->storage);
+        foreach (glob($this->storage . '/*') as $path) {
+            is_file($path) ? unlink($path) : rmdir($path);
+        }
+
+        rmdir($this->storage);
     }
 
     /** @test */
