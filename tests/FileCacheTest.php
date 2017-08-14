@@ -2,6 +2,7 @@
 
 namespace Greg\Cache;
 
+use Greg\Support\Dir;
 use PHPUnit\Framework\TestCase;
 
 class FileCacheTest extends TestCase
@@ -15,26 +16,14 @@ class FileCacheTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
+        Dir::make($this->storage);
 
         $this->cache = new FileCache($this->storage, 300, 1, 1);
     }
 
     public function tearDown()
     {
-        parent::tearDown();
-
-        foreach (glob($this->storage . DIRECTORY_SEPARATOR . '*.cache.txt') as $file) {
-            unlink($file);
-        }
-
-        if (is_dir(__DIR__ . '/read')) {
-            rmdir(__DIR__ . '/read');
-        }
-
-        if (is_dir(__DIR__ . '/write')) {
-            rmdir(__DIR__ . '/write');
-        }
+        Dir::unlink($this->storage);
     }
 
     /** @test */
@@ -189,11 +178,11 @@ class FileCacheTest extends TestCase
     /** @test */
     public function it_throws_exception_if_path_not_readable()
     {
-        mkdir(__DIR__ . '/write', 0300);
+        mkdir($this->storage . '/write', 0300);
 
         $this->expectException(CacheException::class);
 
-        $cache = new FileCache(__DIR__ . '/write');
+        $cache = new FileCache($this->storage . '/write');
 
         $cache->set('foo', 'FOO');
     }
@@ -201,11 +190,11 @@ class FileCacheTest extends TestCase
     /** @test */
     public function it_throws_exception_if_path_not_writable()
     {
-        mkdir(__DIR__ . '/read', 0500);
+        mkdir($this->storage . '/read', 0500);
 
         $this->expectException(CacheException::class);
 
-        $cache = new FileCache(__DIR__ . '/read');
+        $cache = new FileCache($this->storage . '/read');
 
         $cache->set('foo', 'FOO');
     }
