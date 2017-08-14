@@ -18,9 +18,11 @@ class SqliteCacheTest extends TestCase
      */
     private $cache;
 
+    private $storage = __DIR__ . '/storage';
+
     public function setUp()
     {
-        parent::setUp();
+        mkdir($this->storage, 0777);
 
         file_put_contents($this->db, '');
 
@@ -31,9 +33,11 @@ class SqliteCacheTest extends TestCase
 
     public function tearDown()
     {
-        parent::tearDown();
+        foreach (glob($this->storage . '/*') as $path) {
+            is_file($path) ? unlink($path) : rmdir($path);
+        }
 
-        unlink($this->db);
+        rmdir($this->storage);
     }
 
     /** @test */
