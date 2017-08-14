@@ -1,8 +1,7 @@
 <?php
 
-namespace Greg\Cache\Tests;
+namespace Greg\Cache;
 
-use Greg\Cache\SqliteCache;
 use PHPUnit\Framework\TestCase;
 
 class SqliteCacheTest extends TestCase

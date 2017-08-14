@@ -1,9 +1,7 @@
 <?php
 
-namespace Greg\Cache\Tests;
+namespace Greg\Cache;
 
-use Greg\Cache\CacheException;
-use Greg\Cache\FileCache;
 use PHPUnit\Framework\TestCase;
 
 class FileCacheTest extends TestCase

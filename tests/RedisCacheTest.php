@@ -1,8 +1,7 @@
 <?php
 
-namespace Greg\Cache\Tests;
+namespace Greg\Cache;
 
-use Greg\Cache\RedisCache;
 use PHPUnit\Framework\TestCase;
 
 class RedisCacheTest extends TestCase
