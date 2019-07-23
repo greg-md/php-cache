@@ -20,7 +20,7 @@ class SqliteCacheTest extends TestCase
 
     private $storage = __DIR__ . '/storage';
 
-    public function setUp()
+    protected function setUp(): void
     {
         mkdir($this->storage, 0777);
 
@@ -31,7 +31,7 @@ class SqliteCacheTest extends TestCase
         $this->cache = new SqliteCache($this->pdo);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         foreach (glob($this->storage . '/*') as $path) {
             is_file($path) ? unlink($path) : rmdir($path);

@@ -16,7 +16,7 @@ class RedisCacheTest extends TestCase
      */
     private $cache;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class RedisCacheTest extends TestCase
         $this->cache = new RedisCache($this->redis);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 

@@ -13,14 +13,14 @@ class FileCacheTest extends TestCase
 
     private $storage = __DIR__ . '/storage';
 
-    public function setUp()
+    protected function setUp(): void
     {
         mkdir($this->storage, 0777);
 
         $this->cache = new FileCache($this->storage, 300, 1, 1);
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         foreach (glob($this->storage . '/*') as $path) {
             is_file($path) ? unlink($path) : rmdir($path);
