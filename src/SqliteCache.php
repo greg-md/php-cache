@@ -61,7 +61,7 @@ class SqliteCache extends CacheAbstract
                 $expiredKeys[] = $row['Key'];
             }
 
-            ++$count;
+            $count++;
         }
 
         if ($expiredKeys) {
