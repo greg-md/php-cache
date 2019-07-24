@@ -54,11 +54,11 @@ class RedisCache extends CacheAbstract
         if ($prefix = $this->adapter->getOption(\Redis::OPT_PREFIX)) {
             $this->adapter->setOption(\Redis::OPT_PREFIX, '');
 
-            $this->adapter->delete($keys);
+            $this->adapter->del($keys);
 
             $this->adapter->setOption(\Redis::OPT_PREFIX, $prefix);
         } else {
-            $this->adapter->delete($keys);
+            $this->adapter->del($keys);
         }
 
         return $this;
