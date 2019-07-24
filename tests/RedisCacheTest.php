@@ -75,7 +75,7 @@ class RedisCacheTest extends TestCase
 
         $this->cache->delete('foo');
 
-        $this->assertFalse($this->redis->exists('foo'));
+        $this->assertEquals(0, $this->redis->exists('foo'));
     }
 
     /** @test */
