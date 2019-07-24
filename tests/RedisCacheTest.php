@@ -39,7 +39,7 @@ class RedisCacheTest extends TestCase
 
         $this->redis->setOption(\Redis::OPT_PREFIX, '');
 
-        $this->redis->delete($keys);
+        $this->redis->del($keys);
 
         $this->redis->setOption(\Redis::OPT_PREFIX, (string) $prefix);
     }
