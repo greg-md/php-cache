@@ -42,7 +42,7 @@ class RedisCache extends CacheAbstract
 
     public function delete(string $key)
     {
-        $this->adapter->delete($key);
+        $this->adapter->del($key);
 
         return $this;
     }
